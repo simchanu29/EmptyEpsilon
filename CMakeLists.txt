@@ -5,8 +5,10 @@ option(ENABLE_CRASH_LOGGER "Enable the drmingw crash logging facilities" OFF)
 message(STATUS "ENABLE_CRASH_LOGGER is " ${ENABLE_CRASH_LOGGER})
 option(COMPILE_DEV_HELPER "Compile with the 'DEBUG' fpreprocessor flag" OFF)
 message(STATUS "COMPILE_DEV_HELPER is " ${COMPILE_DEV_HELPER})
-
+set(CMAKE_CXX_FLAGS  "-I${CMAKE_SOURCE_DIR}/../SFML/win32/include -L${CMAKE_SOURCE_DIR}/../SFML/win32/lib -lsfml-system -lsfml-window -lsfml-graphics -lsfml-audio -lsfml-network")
+message(STATUS "lib: -L${CMAKE_SOURCE_DIR}/../SFML/win32/lib")
 cmake_policy(SET CMP0074 NEW)
+message(STATUS "${WIN32}")
 
 # Check if serious proton dir is set.
 if(NOT DEFINED SERIOUS_PROTON_DIR)
@@ -381,9 +383,13 @@ include_directories(${SERIOUS_PROTON_DIR}/src)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 ## Setup SFML
-find_package(SFML 2.3 REQUIRED system window graphics network audio)
+# set(SFML_STATIC_LIBRARIES TRUE)
+set(SFML_DIR "/home/yuvalm/projects/ee/SFML/win32/lib/cmake/SFML")
+find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
 include_directories(${SFML_INCLUDE_DIR})
-target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
+message(STATUS "SFML_LIBRARIES: ${SFML_LIBRARIES}")
+message(STATUS "EXECUTABLE: ${EXECUTABLE_NAME}")
+target_link_libraries(${EXECUTABLE_NAME} -lsfml-system -lsfml-window -lsfml-graphics -lsfml-audio -lsfml-network)
 
 # Setup OpenGl
 find_package(OpenGL REQUIRED)
@@ -404,12 +410,18 @@ endif()
 
 
 include(InstallRequiredSystemLibraries)
+if(MINGW)
+    message(STATUS "MINGW detected")
+    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static-libstdc++ -static-libgcc")
+endif()
 
 if(WIN32)
   execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libstdc++-6.dll OUTPUT_VARIABLE MINGW_STDCPP_DLL OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libgcc_s_sjlj-1.dll OUTPUT_VARIABLE MINGW_LIBGCC_DLL OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libwinpthread-1.dll OUTPUT_VARIABLE MINGW_PTHREAD_DLL OUTPUT_STRIP_TRAILING_WHITESPACE)
+  message(STATUS "FILES ${MINGW_STDCPP_DLL} ${MINGW_LIBGCC_DLL} ${MINGW_PTHREAD_DLL} DESTINATION .")
   install(FILES ${MINGW_STDCPP_DLL} ${MINGW_LIBGCC_DLL} ${MINGW_PTHREAD_DLL} DESTINATION .)
+
   install(FILES /usr/i686-w64-mingw32/lib/libwinpthread-1.dll DESTINATION .)
   install(FILES ${SFML_ROOT}/bin/OpenAL32.dll DESTINATION .)
   install(FILES ${SFML_ROOT}/bin/libFLAC-8.dll DESTINATION .)
