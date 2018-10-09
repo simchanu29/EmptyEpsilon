@@ -131,10 +131,15 @@ set(SOURCES
 	src/screens/extra/damcon.cpp
 	src/screens/extra/powerManagement.cpp
 	src/screens/extra/databaseScreen.cpp
+	src/screens/extra/commsScreen.cpp
 	src/screens/extra/shipLogScreen.cpp
+	src/screens/extra/radarScreen.cpp
+	src/screens/extra/probeScreen.cpp
 	src/screens/gm/gameMasterScreen.cpp
 	src/screens/gm/chatDialog.cpp
 	src/screens/gm/tweak.cpp
+	src/screens/helios/navigationScreen.h
+	src/screens/helios/navigationScreen.cpp
 	src/screenComponents/aimLock.cpp
 	src/screenComponents/alertOverlay.cpp
 	src/screenComponents/helpOverlay.cpp
@@ -154,6 +159,7 @@ set(SOURCES
 	src/screenComponents/beamTargetSelector.cpp
 	src/screenComponents/shipInternalView.cpp
 	src/screenComponents/beamFrequencySelector.cpp
+	src/screenComponents/sectorsView.cpp
 	src/screenComponents/radarView.cpp
 	src/screenComponents/rawScannerDataRadarOverlay.cpp
 	src/screenComponents/scanTargetButton.cpp
@@ -177,6 +183,7 @@ set(SOURCES
 	src/screenComponents/hackingDialog.cpp
 	src/screenComponents/customShipFunctions.cpp
 	src/screenComponents/scrollingBanner.cpp
+	src/screenComponents/navigationView.cpp
 	src/gui/colorConfig.cpp
 	src/gui/hotkeyConfig.cpp
 	src/gui/mouseRenderer.cpp
