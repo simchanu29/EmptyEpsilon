@@ -32,6 +32,7 @@ REGISTER_SCRIPT_SUBCLASS_NO_CREATE(SpaceShip, ShipTemplateBasedObject)
     REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, setMaxEnergy);
     REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, getEnergy);
     REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, setEnergy);
+    REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, getBeamsFrequency);
     REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, getSystemHealth);
     REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, setSystemHealth);
     REGISTER_SCRIPT_CLASS_FUNCTION(SpaceShip, getSystemHeat);
@@ -90,6 +91,7 @@ SpaceShip::SpaceShip(string multiplayerClassName, float multiplayer_significant_
     has_warp_drive = true;
     warp_request = 0.0;
     current_warp = 0.0;
+    max_warp = 2.0;
     has_jump_drive = true;
     jump_drive_min_distance = 5000.0;
     jump_drive_max_distance = 50000.0;
@@ -123,6 +125,7 @@ SpaceShip::SpaceShip(string multiplayerClassName, float multiplayer_significant_
     registerMemberReplication(&has_warp_drive);
     registerMemberReplication(&warp_request, 0.1);
     registerMemberReplication(&current_warp, 0.1);
+    registerMemberReplication(&max_warp, 0.5);
     registerMemberReplication(&has_jump_drive);
     registerMemberReplication(&jump_drive_charge, 0.5);
     registerMemberReplication(&jump_delay, 0.5);
@@ -464,6 +467,10 @@ void SpaceShip::update(float delta)
         }
         if ((docking_state == DS_Docked) || (docking_state == DS_Docking))
             warp_request = 0.0;
+            
+        if (gameGlobalInfo->terrain.defined){
+            max_warp = 2.0f + 2.0f * float(gameGlobalInfo->getTerrainPixel(getPosition()).a) / 255;
+        }
     }
 
     float rotationDiff = sf::angleDifference(getRotation(), target_rotation);
@@ -474,7 +481,7 @@ void SpaceShip::update(float delta)
         setAngularVelocity(-turn_speed * getSystemEffectiveness(SYS_Maneuver));
     else
         setAngularVelocity(rotationDiff * turn_speed * getSystemEffectiveness(SYS_Maneuver));
-
+    
     if ((has_jump_drive && jump_delay > 0) || (has_warp_drive && warp_request > 0))
     {
         if (WarpJammer::isWarpJammed(getPosition()))
@@ -513,16 +520,17 @@ void SpaceShip::update(float delta)
             if (current_impulse < 0.0)
                 current_impulse = 0.0;
         }else{
-            if (current_warp < warp_request)
+            float destWarp = std::min(float(warp_request), max_warp);
+            if (current_warp < destWarp) 
             {
                 current_warp += delta / warp_charge_time;
-                if (current_warp > warp_request)
-                    current_warp = warp_request;
-            }else if (current_warp > warp_request)
+                if (current_warp > destWarp)
+                    current_warp = destWarp;  
+            } else if (current_warp > destWarp)
             {
-                current_warp -= delta / warp_decharge_time;
-                if (current_warp < warp_request)
-                    current_warp = warp_request;
+                current_warp -= std::max(1.0f, destWarp - current_warp) * delta / warp_decharge_time;
+                if (current_warp < destWarp)
+                    current_warp = destWarp;
             }
         }
     }else{

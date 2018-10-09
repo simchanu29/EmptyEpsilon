@@ -21,7 +21,13 @@ enum ECrewPosition
     damageControl,
     powerManagement,
     databaseView,
-
+    relayOfficerNC,
+    commsView,
+    tacticalRadar,
+    scienceRadar,
+    relayRadar,
+    navigation,
+    
     max_crew_positions
 };
 

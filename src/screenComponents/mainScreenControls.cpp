@@ -19,6 +19,10 @@ GuiMainScreenControls::GuiMainScreenControls(GuiContainer* owner)
             tactical_button->setVisible(false);
         if (!gameGlobalInfo->allow_main_screen_long_range_radar)
             long_range_button->setVisible(false);
+        if (!gameGlobalInfo->allow_main_screen_global_range_radar)
+            global_range_button->setVisible(false);
+        if (!gameGlobalInfo->allow_main_screen_ship_state)
+            ship_state_button->setVisible(false);
         if (show_comms_button && onscreen_comms_active)
             show_comms_button->setVisible(false);
         if (hide_comms_button && !onscreen_comms_active)
@@ -97,33 +101,54 @@ GuiMainScreenControls::GuiMainScreenControls(GuiContainer* owner)
         closePopup();
     }));
     long_range_button = buttons.back();
-
-    // If the player has control over comms, they can toggle the comms overlay
-    // on the main screen.
-    if (my_player_info->crew_position[relayOfficer] || my_player_info->crew_position[operationsOfficer] || my_player_info->crew_position[singlePilot])
+    
+    // Global-range radar button.
+    buttons.push_back(new GuiButton(this, "MAIN_SCREEN_GLOBAL_RANGE_BUTTON", "Global Range", [this]()
     {
-        buttons.push_back(new GuiButton(this, "MAIN_SCREEN_SHOW_COMMS_BUTTON", "Show comms", [this]()
+        if (my_spaceship)
         {
-            if (my_spaceship)
-            {
-                my_spaceship->commandMainScreenOverlay(MSO_ShowComms);
-                onscreen_comms_active = true;
-            }
-            closePopup();
-        }));
-        show_comms_button = buttons.back();
+            my_spaceship->commandMainScreenSetting(MSS_GlobalRange);
+        }
+        open_button->setValue(false);
+        for(GuiButton* button : buttons)
+            button->setVisible(false);
+    }));
+    global_range_button = buttons.back();
+    
+     // Ship State button.
+    buttons.push_back(new GuiButton(this, "MAIN_SCREEN_SHIP_STATE_BUTTON", "Ship State", [this]()
+    {
+        if (my_spaceship)
+        {
+            my_spaceship->commandMainScreenSetting(MSS_ShipState);
+        }
+        open_button->setValue(false);
+        for(GuiButton* button : buttons)
+            button->setVisible(false);
+    }));
+    ship_state_button = buttons.back();
 
-        buttons.push_back(new GuiButton(this, "MAIN_SCREEN_HIDE_COMMS_BUTTON", "Hide comms", [this]()
+    buttons.push_back(new GuiButton(this, "MAIN_SCREEN_SHOW_COMMS_BUTTON", "Show comms", [this]()
+    {
+        if (my_spaceship)
         {
-            if (my_spaceship)
-            {
-                my_spaceship->commandMainScreenOverlay(MSO_HideComms);
-                onscreen_comms_active = false;
-            }
-            closePopup();
-        }));
-        hide_comms_button = buttons.back();
-    }
+            my_spaceship->commandMainScreenOverlay(MSO_ShowComms);
+            onscreen_comms_active = true;
+        }
+        closePopup();
+    }));
+    show_comms_button = buttons.back();
+
+    buttons.push_back(new GuiButton(this, "MAIN_SCREEN_HIDE_COMMS_BUTTON", "Hide comms", [this]()
+    {
+        if (my_spaceship)
+        {
+            my_spaceship->commandMainScreenOverlay(MSO_HideComms);
+            onscreen_comms_active = false;
+        }
+        closePopup();
+    }));
+    hide_comms_button = buttons.back();
 
     for(GuiButton* button : buttons)
         button->setSize(GuiElement::GuiSizeMax, 50)->setVisible(false);

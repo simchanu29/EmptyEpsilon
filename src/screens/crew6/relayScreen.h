@@ -16,6 +16,9 @@ class GuiTextEntry;
 
 class RelayScreen : public GuiOverlay
 {
+public:
+    bool has_comms;
+
 private:
     enum EMode
     {
@@ -37,6 +40,7 @@ private:
     GuiAutoLayout* option_buttons;
     GuiButton* hack_target_button;
     GuiToggleButton* link_to_science_button;
+    GuiToggleButton* link_to_3D_port_button;
     GuiButton* delete_waypoint_button;
     GuiButton* launch_probe_button;
     GuiAutoLayout* view_controls;
@@ -54,10 +58,11 @@ private:
     sf::Vector2f mouse_down_position;
     const float max_distance = 10000000.0f;
     const float min_distance = 6250.0f;
+
 public:
-    RelayScreen(GuiContainer* owner);
+    RelayScreen(GuiContainer* owner, bool has_comms = true);
 
     virtual void onDraw(sf::RenderTarget& window);
 };
 
-#endif//RELAY_SCREEN_H
+#endif //RELAY_SCREEN_H

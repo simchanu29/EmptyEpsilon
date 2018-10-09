@@ -14,7 +14,9 @@ enum EMainScreenSetting
     MSS_Right,
     MSS_Target,
     MSS_Tactical,
-    MSS_LongRange
+    MSS_LongRange,
+    MSS_GlobalRange,
+    MSS_ShipState
 };
 template<> void convert<EMainScreenSetting>::param(lua_State* L, int& idx, EMainScreenSetting& mss);
 
@@ -103,6 +105,11 @@ public:
      * [config] True if we have a warpdrive.
      */
     bool has_warp_drive;
+
+    /*!
+     * [output] Current maximum warp amount, from 0.0 to 4.0
+     */
+    float max_warp;
 
     /*!
      * [input] Level of warp requested, from 0 to 4
@@ -355,6 +362,8 @@ public:
 
     int getShieldsFrequency(void){ return shield_frequency; }
     void setShieldsFrequency(float freq) { if ((freq > SpaceShip::max_frequency) || (freq < 0)) return; shield_frequency = freq;}
+    
+    int getBeamsFrequency(void){ return beam_frequency; }
 
     void setBeamWeapon(int index, float arc, float direction, float range, float cycle_time, float damage)
     {

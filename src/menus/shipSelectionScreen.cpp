@@ -5,6 +5,7 @@
 #include "playerInfo.h"
 #include "gameGlobalInfo.h"
 #include "screens/windowScreen.h"
+#include "screens/extra/probeScreen.h"
 #include "screens/topDownScreen.h"
 #include "screens/cinematicViewScreen.h"
 #include "screens/gm/gameMasterScreen.h"
@@ -36,14 +37,14 @@ ShipSelectionScreen::ShipSelectionScreen()
 
     // List the station types and stations in the right column.
     GuiAutoLayout* stations_layout = new GuiAutoLayout(right_container, "CREW_POSITION_BUTTON_LAYOUT", GuiAutoLayout::LayoutVerticalTopToBottom);
-    stations_layout->setPosition(0, 50, ATopCenter)->setSize(400, 500);
+    stations_layout->setPosition(0, 50, ATopCenter)->setSize(400, 750);
     (new GuiLabel(stations_layout, "CREW_POSITION_SELECT_LABEL", "Select your station", 30))->addBackground()->setSize(GuiElement::GuiSizeMax, 50);
 
     // Crew type selector
     crew_type_selector = new GuiSelector(stations_layout, "CREW_TYPE_SELECTION", [this](int index, string value) {
         updateCrewTypeOptions();
     });
-    crew_type_selector->setOptions({"6/5 player crew", "4/3 player crew", "1 player crew/extras", "Alternative options"})->setSize(GuiElement::GuiSizeMax, 50);
+    crew_type_selector->setOptions({"Helios", "6/5 player crew", "4/3 player crew", "1 player crew/extras", "Alternative options"})->setSize(GuiElement::GuiSizeMax, 50);
 
     // Main screen button
     main_screen_button = new GuiToggleButton(stations_layout, "MAIN_SCREEN_BUTTON", "Main screen", [this](bool value) {
@@ -75,6 +76,7 @@ ShipSelectionScreen::ShipSelectionScreen()
     // Game master button
     game_master_button = new GuiToggleButton(stations_layout, "GAME_MASTER_BUTTON", "Game master", [this](bool value) {
         window_button->setValue(false);
+		probe_button->setValue(false);
         topdown_button->setValue(false);
         cinematic_view_button->setValue(false);
     });
@@ -86,6 +88,7 @@ ShipSelectionScreen::ShipSelectionScreen()
     window_button = new GuiToggleButton(window_button_row, "WINDOW_BUTTON", "Ship window", [this](bool value) {
         game_master_button->setValue(false);
         topdown_button->setValue(false);
+		probe_button->setValue(false);
         cinematic_view_button->setValue(false);
     });
     window_button->setSize(175, 50);
@@ -96,11 +99,21 @@ ShipSelectionScreen::ShipSelectionScreen()
     window_angle->setSize(GuiElement::GuiSizeMax, 50);
     window_angle_label = new GuiLabel(window_angle, "WINDOW_ANGLE_LABEL", "0 degrees", 30);
     window_angle_label->setSize(GuiElement::GuiSizeMax, GuiElement::GuiSizeMax);
+	
+	// Probe view button
+    probe_button = new GuiToggleButton(stations_layout, "PROBE_BUTTON", "Probe view", [this](bool value) {
+        game_master_button->setValue(false);
+        window_button->setValue(false);
+		topdown_button->setValue(false);
+        cinematic_view_button->setValue(false);
+    });
+    probe_button->setSize(GuiElement::GuiSizeMax, 50);
 
     // Top-down view button
     topdown_button = new GuiToggleButton(stations_layout, "TOP_DOWN_3D_BUTTON", "Top-down 3D view", [this](bool value) {
         game_master_button->setValue(false);
         window_button->setValue(false);
+        probe_button->setValue(false);
         cinematic_view_button->setValue(false);
     });
     topdown_button->setSize(GuiElement::GuiSizeMax, 50);
@@ -109,6 +122,7 @@ ShipSelectionScreen::ShipSelectionScreen()
     cinematic_view_button = new GuiToggleButton(stations_layout, "CINEMATIC_VIEW_BUTTON", "Cinematic view", [this](bool value) {
         game_master_button->setValue(false);
         window_button->setValue(false);
+		probe_button->setValue(false);
         topdown_button->setValue(false);
     });
     cinematic_view_button->setSize(GuiElement::GuiSizeMax, 50);
@@ -207,7 +221,7 @@ ShipSelectionScreen::ShipSelectionScreen()
     });
     ready_button->setPosition(0, -50, ABottomCenter)->setSize(300, 50);
 
-    // Set the crew type selector's default to 6/5 person crew screens.
+    // Set the crew type selector's default toHelios crew screens.
     crew_type_selector->setSelectionIndex(0);
     updateCrewTypeOptions();
 
@@ -376,9 +390,11 @@ void ShipSelectionScreen::updateReadyButton()
         // TODO: Allow GM or spectator screens to require a control code.
         else if (game_master_button->getValue() || topdown_button->getValue() || cinematic_view_button->getValue())
             ready_button->enable();
-        // If a player ship and the window view are selected, enable the Ready
-        // button.
+        // If a player ship and the window view are selected, enable the Ready button.
         else if (my_spaceship && window_button->getValue())
+            ready_button->enable();
+		// If a player ship and the probe view are selected, enable the Ready button.
+        else if (my_spaceship && probe_button->getValue())
             ready_button->enable();
         // Otherwise, disable the Ready button.
         else
@@ -399,14 +415,16 @@ void ShipSelectionScreen::updateCrewTypeOptions()
     // Hide and unselect alternative and view screens.
     game_master_button->hide();
     window_button->hide();
+    probe_button->hide();
     window_angle->hide();
     topdown_button->hide();
     cinematic_view_button->hide();
     main_screen_button->setVisible(canDoMainScreen());
     main_screen_button->setValue(false);
-    main_screen_controls_button->setVisible(crew_type_selector->getSelectionIndex() != 3);
+    main_screen_controls_button->setVisible(crew_type_selector->getSelectionIndex() != 4);
     game_master_button->setValue(false);
     window_button->setValue(false);
+    probe_button->setValue(false);
     topdown_button->setValue(false);
     cinematic_view_button->setValue(false);
 
@@ -420,25 +438,40 @@ void ShipSelectionScreen::updateCrewTypeOptions()
     switch(crew_type_selector->getSelectionIndex())
     {
     case 0:
+        crew_position_button[helmsOfficer]->show();
+        crew_position_button[weaponsOfficer]->show();
+        crew_position_button[powerManagement]->show();
+        crew_position_button[scienceOfficer]->show();
+        crew_position_button[relayOfficerNC]->show();
+        crew_position_button[commsView]->show();
+        crew_position_button[navigation]->show();
+        break;
+    case 1:
         for(int n = helmsOfficer; n <= relayOfficer; n++)
         {
             crew_position_button[n]->show();
         }
         break;
-    case 1:
+    case 2:
         for(int n = tacticalOfficer; n <= operationsOfficer; n++)
             crew_position_button[n]->show();
         break;
-    case 2:
+    case 3:
         crew_position_button[singlePilot]->show();
         crew_position_button[damageControl]->show();
         crew_position_button[powerManagement]->show();
         crew_position_button[databaseView]->show();
+        crew_position_button[relayOfficerNC]->show();
+        crew_position_button[commsView]->show();
+        crew_position_button[tacticalRadar]->show();
+        crew_position_button[scienceRadar]->show();
+        crew_position_button[relayRadar]->show();
         break;
-    case 3:
+    case 4:
         main_screen_button->hide();
         game_master_button->setVisible(bool(game_server));
         window_button->setVisible(canDoMainScreen());
+        probe_button->setVisible(canDoMainScreen());
         window_angle->setVisible(canDoMainScreen());
         topdown_button->setVisible(canDoMainScreen());
         cinematic_view_button->setVisible(canDoMainScreen());
@@ -475,6 +508,10 @@ void ShipSelectionScreen::onReadyClick()
     {
         destroy();
         new WindowScreen(int(window_angle->getValue()));
+    }else if (probe_button->getValue())
+    {
+        destroy();
+        new ProbeScreen();
     }else if(topdown_button->getValue())
     {
         my_player_info->commandSetShipId(-1);
