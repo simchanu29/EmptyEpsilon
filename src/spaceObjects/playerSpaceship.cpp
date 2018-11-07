@@ -16,6 +16,16 @@ REGISTER_SCRIPT_SUBCLASS(PlayerSpaceship, SpaceShip)
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getWaypoint);
     // Returns the total number of this ship's active waypoints.
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getWaypointCount);
+    // Takes the index of the fleet as its parameter.
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getFleetLeader);
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getFleetMemberId);
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getFleetMember);
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, setFleetMember);
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getFleetSize);
+    // Returns the total number of this ship's active fleet.
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getFleetCount);
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, createFleet);
+    REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, disbandFleet);
     // Returns the ship's EAlertLevel.
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getAlertLevel);
     // Sets whether this ship's shields are raised or lowered.
@@ -52,7 +62,7 @@ REGISTER_SCRIPT_SUBCLASS(PlayerSpaceship, SpaceShip)
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, setEnergyLevelMax);
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getEnergyLevel);
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getEnergyLevelMax);
-    
+
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, setScanProbeCount);
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, getScanProbeCount);
     REGISTER_SCRIPT_CLASS_FUNCTION(PlayerSpaceship, setMaxScanProbeCount);
