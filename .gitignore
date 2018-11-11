@@ -34,5 +34,6 @@ thumbs.db
 # vim
 *.swp
 
+# build or config EE files
 options.ini
 _build
