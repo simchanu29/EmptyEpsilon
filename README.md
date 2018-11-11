@@ -42,4 +42,8 @@ There is no clear goal where this game is going. This means that there is no for
 
 ## Building
 
+See https://github.com/simchanu29/EmptyEpsilon-build-scripts
+
+Or if you want detailed instructions :
+
 See https://github.com/daid/EmptyEpsilon/wiki/Build-from-sources
